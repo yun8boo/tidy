@@ -34,7 +34,7 @@ const useUser = () => {
   }
 
   useEffect(() => {
-    const cancelAuthListener = firebase.auth().onIdTokenChanged((user) => {
+    const cancelAuthListener = firebase.auth().onAuthStateChanged((user) => {
       if(user) {
         console.log('user', user);
         const userData = mapUserData(user)
@@ -45,13 +45,6 @@ const useUser = () => {
         setUser(undefined)
       }
     })
-    const userFromCookie = getUserFromCookie()
-    if(!userFromCookie) {
-      router.push('/')
-      return
-    }
-    setUser(undefined)
-
     return () => {
       cancelAuthListener()
     }

@@ -1,0 +1,9 @@
+export const BACK_GROUND = '#fffffe';
+export const TITLE = '#094067';
+export const BORDER = '#094067';
+export const BASE_TEXT = '#5f6c7b';
+export const WHITE_TEXT = '#fffffe';
+export const PRIMARY = '#3da9fc';
+export const SECONDARY = '#90b4ce';
+export const ACCENT = '#ef4565';
+export const GRAY = '#f2f2f2';
