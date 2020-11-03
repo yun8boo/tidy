@@ -4,7 +4,6 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import initFirebase from '../auth/initFirebase'
 import {
-  getUserFromCookie,
   setUserCookie,
   removeUserCookkie
 } from './userCookies'
