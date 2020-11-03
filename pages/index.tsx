@@ -88,7 +88,7 @@ const Index = (props: IndexProps) => {
 
 export default Index
 
-export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const value = JSON.parse(getCookie('auth', req))
   const { uid } = await verifyIdToken(value.token)
   const articles: any[] = []
