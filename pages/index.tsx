@@ -1,12 +1,31 @@
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import { useState } from 'react';
+import styled from 'styled-components'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { verifyIdToken } from '../utils/auth/firebaseAdmin';
 import {
   getUserFromCookie,
 } from '../utils/auth/userCookies'
+import getCookie from '../utils/getCookie'
+import initFirebase from '../utils/auth/initFirebase';
 import Layout from '../components/Layout'
 import EmptyState from '../components/EmptyState'
 import Input from '../components/Input'
+import { PRIMARY } from '../constants/style/color';
+import { useUser } from '../utils/auth/useUser';
+import { ArticleType } from '../interfaces';
 
-const Index = () => {
+const { db } = initFirebase()
+
+interface IndexProps {
+  articles: ArticleType[]
+}
+
+const Index = (props: IndexProps) => {
+  const [value, setValue] = useState('')
+  const { user } = useUser()
   const userFromCookie = getUserFromCookie()
   if(!userFromCookie) {
     return (
@@ -19,12 +38,27 @@ const Index = () => {
     )
   }
 
+
+  const handleSetValue = (value: string) => {
+    setValue(value)
+  }
+
+  const handlePostArticle = () => {
+    db.doc(`users/${user!.id}`).collection('articles').add({
+      url: value
+    }).catch(function(error) {
+      console.error("Error adding document: ", error);
+    });
+  }
+
   return (
     <Layout title="Home | Next.js + TypeScript Example">
       <div className='emptystate-wrapper'>
         <EmptyState />
-        <div className='mt-20' />
-        <Input />
+        <div className='input-wrapper mt-20'>
+          <Input setGlovalVale={handleSetValue} />
+          <Icon icon={faPlus} className='plus-icon' onClick={handlePostArticle} />
+        </div>
       </div>
       <style jsx>{`
         .emptystate-wrapper {
@@ -37,6 +71,12 @@ const Index = () => {
           max-width: 1200px;
           width: 100%; 
         }
+        .input-wrapper {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
         .mt-20 {
           margin-top: 20px;
         }
@@ -46,3 +86,30 @@ const Index = () => {
 }
 
 export default Index
+
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+  const value = JSON.parse(getCookie('auth', req))
+  const { uid } = await verifyIdToken(value.token)
+  const articles: any[] = []
+  const quersSnapshot = await db.doc(`users/${uid}`).collection('articles').get()
+  quersSnapshot.forEach(doc => {
+    articles.push(doc.data())
+  })
+  
+  return {
+    props: {
+      articles
+    }
+  }
+}
+
+const Icon = styled(FontAwesomeIcon)`
+  cursor: pointer;
+  margin-left: 15px;
+  color: ${PRIMARY};
+  font-size: 25px;
+  transition: all .3s ease;
+  &:hover {
+    opacity: .8;
+  }
+`

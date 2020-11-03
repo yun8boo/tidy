@@ -1,9 +1,26 @@
+import { useState } from 'react'
 import { GRAY } from '../constants/style/color';
+import lazyFunction from '../utils/lazyFunction';
 
-const Input = () => {
+interface InputProps {
+  setGlovalVale: (value: string) => void
+}
+
+const Input = (props: InputProps) => {
+  const { setGlovalVale } = props
+  const [value, setValue] = useState('')
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value)
+    lazyFunction(setGlovalVale, 500)(e.target.value)
+  }
   return(
     <>
-      <input type="text" placeholder='https://...' />
+      <input
+        type="text"
+        placeholder='https://...'
+        value={value}
+        onChange={handleOnChange}
+      />
       <style jsx>{`
         input {
           border-radius: 5px;
