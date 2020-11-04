@@ -89,7 +89,13 @@ const Index = (props: IndexProps) => {
 export default Index
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
-  const value = JSON.parse(getCookie('auth', req))
+  const cookie = getCookie('auth', req)
+  if(!Object.keys(cookie).length) {
+    return {
+      props: {}
+    }
+  }
+  const value = JSON.parse(cookie)
   const { uid } = await verifyIdToken(value.token)
   const articles: any[] = []
   const quersSnapshot = await db.doc(`users/${uid}`).collection('articles').get()
