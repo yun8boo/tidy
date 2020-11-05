@@ -24,7 +24,7 @@ interface IndexProps {
 }
 
 const Index = (props: IndexProps) => {
-  console.log(props);
+  console.log(props.articles);
   const [value, setValue] = useState('')
   const { user } = useUser()
   const userFromCookie = getUserFromCookie()
