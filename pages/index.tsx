@@ -52,36 +52,48 @@ const Index = (props: IndexProps) => {
     });
   }
 
+  if(!props.articles.length) {
+    return (
+      <Layout title="Home | Next.js + TypeScript Example">
+        <div className='emptystate-wrapper'>
+          <EmptyState />
+          <div className='input-wrapper mt-20'>
+            <Input setGlovalVale={handleSetValue} />
+            <Icon icon={faPlus} className='plus-icon' onClick={handlePostArticle} />
+          </div>
+        </div>
+        <style jsx>{`
+          .emptystate-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            padding: 0 40px;
+            max-width: 1200px;
+            width: 100%; 
+          }
+          .input-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+          }
+          .mt-20 {
+            margin-top: 20px;
+          }
+        `}</style>
+      </Layout>
+    )
+  }
+
   return (
     <Layout title="Home | Next.js + TypeScript Example">
-      <div className='emptystate-wrapper'>
-        <EmptyState />
-        <div className='input-wrapper mt-20'>
-          <Input setGlovalVale={handleSetValue} />
-          <Icon icon={faPlus} className='plus-icon' onClick={handlePostArticle} />
-        </div>
-      </div>
-      <style jsx>{`
-        .emptystate-wrapper {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          margin-top: 50px;
-          padding: 0 40px;
-          max-width: 1200px;
-          width: 100%; 
-        }
-        .input-wrapper {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 100%;
-        }
-        .mt-20 {
-          margin-top: 20px;
-        }
-      `}</style>
+      {props.articles.map(article => {
+        return (
+          <p>{article.url}</p>
+        )
+      })}
     </Layout>
   )
 }
