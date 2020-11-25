@@ -35,7 +35,7 @@ const resolveImageUrl = (metaProps: any) => {
 }
 
 const getMetaPropContent = (metaProps: any, propKey: any) => {
-  const mpObj = metaProps.find((d: any, i: any, arr: any) => {
+  const mpObj = metaProps.find((d: any) => {
     return d[propKey]
   })
   if (mpObj) return mpObj[propKey]
@@ -57,7 +57,7 @@ const getMetaProps = async(url: string) => {
 const extractMetaProps = (html: any) => {
   const $ = cheerio.load(html)
   let results: any[] = []
-  $('head meta').each((i, el) => {
+  $('head meta').each((_, el) => {
     const property = $(el).attr('property')
     const content = $(el).attr('content')
     if (property && content) {
