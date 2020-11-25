@@ -13,6 +13,7 @@ import initFirebase from '../utils/auth/initFirebase';
 import Layout from '../components/Layout'
 import EmptyState from '../components/EmptyState'
 import Input from '../components/Input'
+import Card from '../components/Card';
 import { PRIMARY } from '../constants/style/color';
 import { useUser } from '../utils/auth/useUser';
 import { ArticleType } from '../interfaces';
@@ -24,7 +25,6 @@ interface IndexProps {
 }
 
 const Index = (props: IndexProps) => {
-  console.log(props.articles);
   const [value, setValue] = useState('')
   const { user } = useUser()
   const userFromCookie = getUserFromCookie()
@@ -52,7 +52,7 @@ const Index = (props: IndexProps) => {
     });
   }
 
-  if(!props.articles.length) {
+  if(!!props && !props.articles.length) {
     return (
       <Layout title="Home | Next.js + TypeScript Example">
         <div className='emptystate-wrapper'>
@@ -89,11 +89,16 @@ const Index = (props: IndexProps) => {
 
   return (
     <Layout title="Home | Next.js + TypeScript Example">
-      {props.articles.map(article => {
-        return (
-          <p>{article.url}</p>
-        )
-      })}
+      <CardWrapper>
+        {props.articles.map(article => {
+          const handleDeleteArticle = () => {
+            db.doc(`users/${user!.id}`).collection('articles').doc(article.id).delete()
+          }
+          return (
+            <Card key={article.id} url={article.url} onDelete={handleDeleteArticle} />
+          )
+        })}
+      </CardWrapper>
     </Layout>
   )
 }
@@ -112,7 +117,11 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const articles: any[] = []
   const quersSnapshot = await db.doc(`users/${uid}`).collection('articles').get()
   quersSnapshot.forEach(doc => {
-    articles.push(doc.data())
+    const article = {
+      id: doc.id,
+      ...doc.data()
+    }
+    articles.push(article)
   })
   
   return {
@@ -131,4 +140,10 @@ const Icon = styled(FontAwesomeIcon)`
   &:hover {
     opacity: .8;
   }
+`
+
+const CardWrapper = styled.div`
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
 `

@@ -10,5 +10,13 @@ export type User = {
 }
 
 export interface ArticleType {
+  id: string
   url: string
+}
+
+export interface OgpType {
+  site_name: string
+  title: string
+  description: string
+  image: string
 }
