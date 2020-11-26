@@ -52,7 +52,7 @@ const Index = (props: IndexProps) => {
     });
   }
 
-  if(!!props && !props.articles.length) {
+  if(!!props.articles && !props.articles.length) {
     return (
       <Layout title="Home | Next.js + TypeScript Example">
         <div className='emptystate-wrapper'>
