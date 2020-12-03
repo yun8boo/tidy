@@ -175,9 +175,3 @@ const Icon = styled(FontAwesomeIcon)`
     opacity: .8;
   }
 `
-
-const CardWrapper = styled.div`
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-`
