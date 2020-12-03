@@ -26,8 +26,10 @@ interface IndexProps {
 
 const Index = (props: IndexProps) => {
   const [value, setValue] = useState('')
+  const [articles, setArticles] = useState<ArticleType[]>(!!Object.keys(props) ? props.articles : [])
   const { user } = useUser()
   const userFromCookie = getUserFromCookie()
+  const urlPattern = /https?:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#\u3000-\u30FE\u4E00-\u9FA0\uFF01-\uFFE3]+/g
   if(!userFromCookie) {
     return (
       <div>
@@ -45,16 +47,33 @@ const Index = (props: IndexProps) => {
   }
 
   const handlePostArticle = () => {
+    if(!value || !urlPattern.test(value)) return
     db.doc(`users/${user!.id}`).collection('articles').add({
       url: value
-    }).catch(function(error) {
+    }).then(docData => {
+      docData.get().then(res => {
+        const article = {
+          id: res.id,
+          url: res.data()!.url
+        }
+        const updateArticles = [...articles, article]
+        setArticles(updateArticles)
+      });
+    })
+    .catch(function(error) {
       console.error("Error adding document: ", error);
     });
   }
 
-  if(!!props.articles && !props.articles.length) {
+  const handleDeleteArticle = async (id: string) => {
+    await db.doc(`users/${user!.id}`).collection('articles').doc(id).delete()
+    const updateArticles = articles.filter(article => article.id !== id)
+    setArticles(updateArticles)
+  }
+
+  if(!articles.length) {
     return (
-      <Layout title="Home | Next.js + TypeScript Example">
+      <Layout>
         <div className='emptystate-wrapper'>
           <EmptyState />
           <div className='input-wrapper mt-20'>
@@ -88,17 +107,32 @@ const Index = (props: IndexProps) => {
   }
 
   return (
-    <Layout title="Home | Next.js + TypeScript Example">
-      <CardWrapper>
-        {props.articles.map(article => {
-          const handleDeleteArticle = () => {
-            db.doc(`users/${user!.id}`).collection('articles').doc(article.id).delete()
-          }
-          return (
-            <Card key={article.id} url={article.url} onDelete={handleDeleteArticle} />
-          )
-        })}
-      </CardWrapper>
+    <Layout>
+      <div className='container'>
+        <div className='input-wrapper mt-20'>
+          <Input setGlovalVale={handleSetValue} />
+          <Icon icon={faPlus} className='plus-icon' onClick={handlePostArticle} />
+        </div>
+        <div className='card-wrapper'>
+          {articles.map(article => {
+            return (
+              <Card key={article.id} url={article.url} onDelete={() => handleDeleteArticle(article.id)} />
+            )
+          })}
+        </div>
+      </div>
+      <style jsx>{`
+        .container {
+          text-align: center;
+          margin-top: 20px;
+        }
+        .card-wrapper {
+          display: flex;
+          flex-wrap: wrap;
+          margin-top: 20px;
+        }
+      `}</style>
+      
     </Layout>
   )
 }

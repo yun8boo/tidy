@@ -16,7 +16,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 const Card = (props: CardProps) => {
   const { url, onDelete } = props
   const { data, error } = useSwr<OgpType, any>(`/api/ogp?url=${url}`, fetcher)
-
+  console.log(data);
   const content = () => {
     if(error) {
       return (

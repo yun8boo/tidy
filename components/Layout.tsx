@@ -1,8 +1,7 @@
 import React, { ReactNode } from 'react'
-import Link from 'next/link'
 import Head from 'next/head'
 import { BASE_TEXT, TITLE, BACK_GROUND } from '../constants/style/color';
-import { useUser } from '../utils/auth/useUser';
+import Header from './Header';
 
 type Props = {
   children?: ReactNode
@@ -10,7 +9,6 @@ type Props = {
 }
 
 const Layout = ({ children, title = 'This is the default title' }: Props) => {
-  const { logout } = useUser()
   return (
     <div>
       <Head>
@@ -18,12 +16,7 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <header>
-        <Link href="/">
-          <a>Home</a>
-        </Link>
-        <button onClick={logout}>logout</button>
-      </header>
+      <Header />
       <div className='container'>
         {children}
       </div>
