@@ -18,7 +18,7 @@ import { PRIMARY } from '../constants/style/color';
 import { useUser } from '../utils/auth/useUser';
 import { ArticleType } from '../interfaces';
 
-const { db } = initFirebase()
+const { db, firestore } = initFirebase()
 
 interface IndexProps {
   articles: ArticleType[]
@@ -48,13 +48,18 @@ const Index = (props: IndexProps) => {
 
   const handlePostArticle = () => {
     if(!value || !urlPattern.test(value)) return
+    const now = new Date()
     db.doc(`users/${user!.id}`).collection('articles').add({
-      url: value
+      url: value,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+      deadLineAt: new Date(now.setDate(now.getDate() + 7))
     }).then(docData => {
       docData.get().then(res => {
         const article = {
           id: res.id,
-          url: res.data()!.url
+          url: res.data()!.url,
+          createdAt: res.data()!.createdAt,
+          deadLineAt: res.data()!.deadLineAt,
         }
         const updateArticles = [...articles, article]
         setArticles(updateArticles)
@@ -116,7 +121,7 @@ const Index = (props: IndexProps) => {
         <div className='card-wrapper'>
           {articles.map(article => {
             return (
-              <Card key={article.id} url={article.url} onDelete={() => handleDeleteArticle(article.id)} />
+              <Card key={article.id} url={article.url} deadLineAt={article.deadLineAt || null} onDelete={() => handleDeleteArticle(article.id)} />
             )
           })}
         </div>
@@ -151,13 +156,17 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const articles: any[] = []
   const quersSnapshot = await db.doc(`users/${uid}`).collection('articles').get()
   quersSnapshot.forEach(doc => {
+    if(!!doc.data().createdAt) console.log(doc.data().createdAt.toDate());
     const article = {
       id: doc.id,
-      ...doc.data()
+      url: doc.data().url,
+      createdAt: !!doc.data().createdAt ?  String(doc.data().createdAt.toDate()) : null,
+      deadLineAt: !!doc.data().deadLineAt ? String(doc.data().deadLineAt.toDate()) : null
     }
     articles.push(article)
   })
-  
+  console.log('articles', articles);
+
   return {
     props: {
       articles

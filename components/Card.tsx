@@ -2,19 +2,20 @@ import React from 'react'
 import useSwr from 'swr'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTrashAlt, faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { TITLE, BASE_TEXT, GRAY } from '../constants/style/color';
 import { OgpType } from '../interfaces';
 
 interface CardProps {
   url: string
+  deadLineAt: string | null
   onDelete: () => void
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 const Card = (props: CardProps) => {
-  const { url, onDelete } = props
+  const { url, deadLineAt, onDelete } = props
   const { data, error } = useSwr<OgpType, any>(`/api/ogp?url=${url}`, fetcher)
   console.log(data);
   const content = () => {
@@ -53,6 +54,11 @@ const Card = (props: CardProps) => {
         {content()}
       </Wrapper>
       <ActiveWrapper>
+        <div>
+          {deadLineAt}
+        </div>
+        <EllipsisButton icon={faEllipsisH} onClick={onDelete}  />
+        <Margin />
         <TrashButton icon={faTrashAlt} onClick={onDelete}  />
       </ActiveWrapper>
     </Container>
@@ -124,6 +130,16 @@ const ActiveWrapper = styled.div`
   padding: 15px 10px;
 `
 
+const EllipsisButton = styled(FontAwesomeIcon)`
+  cursor: pointer;
+  color: ${BASE_TEXT};
+  font-size: 15px;
+  transition: all .3s ease;
+  &:hover {
+    opacity: .8;
+  }
+`
+
 const TrashButton = styled(FontAwesomeIcon)`
   cursor: pointer;
   color: ${BASE_TEXT};
@@ -132,4 +148,8 @@ const TrashButton = styled(FontAwesomeIcon)`
   &:hover {
     opacity: .8;
   }
+`
+
+const Margin = styled.div`
+  margin-right: 10px;
 `

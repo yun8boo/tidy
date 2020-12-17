@@ -14,5 +14,6 @@ export default function initFirebase() {
     firebase.initializeApp(config)
   }
   const db = firebase.firestore()
-  return { db }
+  const firestore = firebase.firestore
+  return { db, firestore }
 }

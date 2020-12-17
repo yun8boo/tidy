@@ -12,6 +12,8 @@ export type User = {
 export interface ArticleType {
   id: string
   url: string
+  deadLineAt: string | null
+  createdAt: string | null
 }
 
 export interface OgpType {
